@@ -1,0 +1,9 @@
+[pythia-70m]
+name = "EleutherAI/pythia-70m"
+ckpt1 =  "step142000"
+ckpt2 =  "step143000"
+
+[OLMo-2-1124-7B]
+name = "allenai/OLMo-2-1124-7B"
+ckpt1 = "stage1-step928000-tokens3893B"
+ckpt2 = "stage1-step928646-tokens3896B"

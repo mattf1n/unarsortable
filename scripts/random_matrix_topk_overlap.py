@@ -23,7 +23,9 @@ def expected_overlap(k, trial_count):
     objective = cp.Maximize(cp.min(top_scores[1:] - top_scores[:-1]))
     problem = cp.Problem(objective, constraints)
     for trial in tqdm(range(trial_count)):
-        unembed.value = rng.standard_normal((v, d))
+	array = rng.standard_normal((v, d))
+        unembed.value = array
+	print(realizes(unembed, np.arange(k)))
         problem.solve(solver="MOSEK", ignore_dpp=True)
         successes += problem.value >= 1e-5
     print(k, successes, trial_count, file=sys.stderr)
