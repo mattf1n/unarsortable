@@ -37,11 +37,13 @@ def realizes(array, topk, warm_start=None, **kwargs):
 	top_scores = scores[topk]
 	botk = np.delete(np.arange(vocab_size), topk)
 	bottom_scores = scores[botk]
-	epsilon = 1e-10 / len(topk)
+	epsilon = 1e-6
 	constraints = [
-	top_scores[:-1] >= top_scores[1:],
-	top_scores[-1] >= bottom_scores,
-	]
+			top_scores[:-1] >= top_scores[1:] + epsilon,
+			top_scores[-1] >= bottom_scores + epsilon,
+			-10 <= embed,
+			embed <= 10
+			]
 	objective = cp.Maximize(cp.min(top_scores[:-1] - top_scores[1:]))
 	problem = cp.Problem(objective, constraints)
 	solve_kwargs = dict(solver="MOSEK", ignore_dpp=True, canon_backend="SCIPY") | kwargs
@@ -54,4 +56,8 @@ def realizes(array, topk, warm_start=None, **kwargs):
 	if solve_kwargs["solver"] in ["CPLEX", "GUROBI"]:
 		solve_kwargs["reoptimize"] = True
 	problem.solve(**solve_kwargs)
+	if problem.status == 'optimal':
+		sol_scores = array @ embed.value
+		sol_topk = np.argsort(-sol_scores)[:len(topk)]
+		assert set(sol_topk) == set(topk)
 	return problem.value >= 0.1
