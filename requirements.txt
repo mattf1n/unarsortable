@@ -4,3 +4,6 @@ tqdm
 mosek
 torch
 transformers
+jaxlib
+jax
+jaxopt
